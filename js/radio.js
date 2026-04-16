@@ -7,9 +7,9 @@
       logo: "img/zaga.png"
     },
     {
-      name: "ZuccaRadio",
-      url: "https://stream.zuccaradio.com/stream.mp3",
-      logo: "img/zucca_radio.png"
+      name: "Chillhop",
+      url: "https://streams.ilovemusic.de/iloveradio16.mp3",
+      logo: "img/chillhop.png"
     },
     {
       name: "LoFi Radio",
@@ -29,16 +29,13 @@
   canvas.width = 800;
   canvas.height = 100;
 
-  let audioCtx;
-  let analyser;
-  let source;
-  let dataArray;
+  let analyser, audioCtx, source, dataArray;
   let started = false;
 
   // =========================
-  // INIT AUDIO GRAPH (IMPORTANT FIX)
+  // INIT VISUAL ONLY WHEN NEEDED
   // =========================
-  function initAudio() {
+  function initAudioGraph() {
 
     if (started) return;
     started = true;
@@ -85,37 +82,40 @@
   }
 
   // =========================
-  // PLAY FIX (IMPORTANT)
+  // 🔥 SAFE PLAY (FIXED AUDIO PIPELINE)
   // =========================
   function play(s) {
 
-  stationName.textContent = s.name;
-  nowPlaying.textContent = "Live";
+    stationName.textContent = s.name;
+    nowPlaying.textContent = "Live";
 
-  // ⚠️ reset audio properly
-  audio.pause();
-  audio.src = "";
-  audio.load();
+    // HARD RESET AUDIO
+    audio.pause();
+    audio.src = "";
+    audio.load();
 
-  setTimeout(() => {
+    setTimeout(() => {
 
-    audio.src = s.url;
+      audio.src = s.url;
 
-    audio.play().then(() => {
+      audio.play()
+        .then(() => {
 
-      if (!started) initAudio();
+          // init visualiser AFTER success
+          initAudioGraph();
 
-      if (audioCtx && audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
+          if (audioCtx && audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
 
-    }).catch(err => {
-      console.log("Audio play failed:", err);
-    });
+        })
+        .catch(err => {
+          console.log("PLAY ERROR:", err);
+        });
 
-  }, 50);
+    }, 100);
 
-}
+  }
 
   // =========================
   // UI
