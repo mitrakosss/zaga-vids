@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Zaga - Radio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    
+    <a class="brand" href="videos.html">
+      <img src="img/logo.png" alt="Zaga">
+      <div class="title">
+        <b>ZagaTV</b>
+        <span>Radio</span>
+      </div>
+    </a>
+
+    <div class="search-container"></div>
+
+    <div class="right-actions">
+      <a class="btn" href="videos.html">Videos</a>
+      <div class="pill">📻 Radio</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page">
+
+  <h2 style="margin:10px 0;">Live Radio</h2>
+
+  <div class="radio-grid" id="radioGrid"></div>
+
+  <div class="radio-player" id="playerBox">
+    <h3 id="stationName">Select a station</h3>
+    <audio id="audioPlayer" controls></audio>
+  </div>
+
+</div>
+
+<script src="js/radio.js"></script>
+</body>
+</html>

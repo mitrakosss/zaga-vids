@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Zaga - Videos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+
+<div id="loading-screen" class="loading-screen">
+  <div class="spinner"></div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="videos.html">
+      <img src="img/logo.png" alt="Zaga">
+      <div class="title">
+        <b>ZagaTV</b>
+        <span>Private Vault</span>
+      </div>
+    </a>
+
+    <div class="search-container">
+      <input id="search-input" placeholder="Αναζήτηση...">
+    </div>
+
+    <div class="right-actions">
+      <div class="pill">👤 <span id="current-user">—</span></div>
+	  
+	  <a class="btn" href="radio.html" style="background:#7c3aed;">📻 Radio</a>
+
+      <a id="admin-link" class="btn" href="admin.html" style="display:none;">Admin</a>
+      <button id="logoutBtn" class="btn danger">Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <section id="historySection">
+    <div class="section-title">
+      <b>Continue watching</b>
+      <button id="clearHistoryBtn" class="btn">Clear</button>
+    </div>
+    <div id="historyRow" class="history-row"></div>
+  </section>
+
+  <div id="video-grid"></div>
+</div>
+
+<div id="modal" class="modal">
+  <span id="close">&times;</span>
+  <iframe id="modal-video" allowfullscreen></iframe>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Zaga - Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="videos.html">
+      <img src="img/logo.png" alt="Zaga">
+      <div class="title">
+        <b>ZagaTV</b>
+        <span>Admin</span>
+      </div>
+    </a>
+
+    <div class="search-container"></div>
+
+    <div class="right-actions">
+      <div class="pill">👑 <span id="admin-user">—</span></div>
+      <a class="btn" href="videos.html">Back</a>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <h2 style="margin: 6px 0 14px;">Users</h2>
+  <div id="adminMsg" class="info-message" style="display:none;"></div>
+  <div id="adminErr" class="error-message" style="display:none;"></div>
+
+  <div id="usersTable" style="overflow:auto;"></div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
