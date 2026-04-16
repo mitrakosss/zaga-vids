@@ -616,3 +616,22 @@ body.modal-open .topbar {
   width: 0%;
   background: #00e5ff;
 }
+
+.play-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #00e5ff;
+  color: #000;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0,229,255,0.4);
+  transition: 0.2s;
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(0,229,255,0.7);
+}
