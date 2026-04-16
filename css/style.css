@@ -651,3 +651,30 @@ body.modal-open .topbar {
   transform: scale(1.1);
   box-shadow: 0 0 30px rgba(0,229,255,0.7);
 }
+
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* GRID NOW IS A BLOCK INSIDE CENTER */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 180px);
+  gap: 18px;
+}
+
+/* responsive */
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(2, 160px);
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: repeat(1, 180px);
+  }
+}
