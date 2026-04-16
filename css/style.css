@@ -599,3 +599,40 @@ body.modal-open .topbar {
   height: 80px;
   background: transparent;
 }
+
+/* PROGRESS */
+.progress {
+  width: 90%;
+  max-width: 500px;
+  height: 4px;
+  background: #222;
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: #00e5ff;
+}
+
+/* MINI PLAYER */
+.mini-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-top: 1px solid #222;
+}
+
+.mini-player img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
