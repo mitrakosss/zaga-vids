@@ -89,26 +89,33 @@
   // =========================
   function play(s) {
 
-    stationName.textContent = s.name;
-    nowPlaying.textContent = "Live";
+  stationName.textContent = s.name;
+  nowPlaying.textContent = "Live";
+
+  // ⚠️ reset audio properly
+  audio.pause();
+  audio.src = "";
+  audio.load();
+
+  setTimeout(() => {
 
     audio.src = s.url;
-    audio.load();
 
     audio.play().then(() => {
 
-      // ⚠️ MUST be triggered AFTER user click + play success
-      initAudio();
+      if (!started) initAudio();
 
       if (audioCtx && audioCtx.state === "suspended") {
         audioCtx.resume();
       }
 
     }).catch(err => {
-      console.log("Play error:", err);
+      console.log("Audio play failed:", err);
     });
 
-  }
+  }, 50);
+
+}
 
   // =========================
   // UI
