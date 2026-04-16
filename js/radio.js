@@ -9,7 +9,7 @@
     {
       name: "ZuccaRadio",
       url: "https://stream.zuccaradio.com/stream.mp3",
-      logo: "img/zucca_radio.mp3"
+      logo: "img/zucca_radio.png"
     },
     {
       name: "LoFi Radio",
