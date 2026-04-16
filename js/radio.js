@@ -7,9 +7,9 @@
       logo: "img/zaga.png"
     },
     {
-      name: "Chillhop",
-      url: "https://streams.ilovemusic.de/iloveradio16.mp3",
-      logo: "img/chillhop.png"
+      name: "ZuccaRadio",
+      url: "https://stream.zuccaradio.com/stream.mp3",
+      logo: "img/zucca_radio.mp3"
     },
     {
       name: "LoFi Radio",
