@@ -616,23 +616,3 @@ body.modal-open .topbar {
   width: 0%;
   background: #00e5ff;
 }
-
-/* MINI PLAYER */
-.mini-player {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #111;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-top: 1px solid #222;
-}
-
-.mini-player img {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-}
