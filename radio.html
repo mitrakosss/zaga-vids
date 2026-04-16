@@ -6,174 +6,132 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" href="css/style.css">
-
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   background: #0b0b0b;
   color: white;
+  overflow-x: hidden;
 }
 
-/* ===== TOPBAR (same vibe as videos page) ===== */
+/* BACKGROUND BLUR */
+.bg {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.4);
+  z-index: -1;
+  transition: 0.5s;
+}
+
+/* TOPBAR */
 .topbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 12px 18px;
-  background: rgba(17,17,17,0.95);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  border-bottom: 1px solid #222;
+  padding: 12px 16px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-
-.brand span {
-  font-weight: normal;
-  opacity: 0.6;
-}
-
-/* ===== BUTTON ===== */
 .btn {
   background: #1f1f1f;
-  color: white;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 8px;
   text-decoration: none;
-  font-size: 14px;
-  transition: 0.2s;
-  border: 1px solid #2a2a2a;
+  color: white;
 }
 
-.btn:hover {
-  background: #2a2a2a;
-}
-
-/* ===== PAGE ===== */
-.page {
-  padding: 18px;
-}
-
-/* ===== GRID ===== */
-.radio-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-  margin-top: 15px;
-}
-
-/* ===== CARD ===== */
-.card {
-  background: #151515;
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.25s;
-  border: 1px solid #222;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  background: #202020;
-}
-
-.card-inner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.card img {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid #333;
-}
-
-/* ===== PLAYER ===== */
+/* PLAYER */
 .player {
-  margin-top: 25px;
-  background: #111;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
 }
 
+/* ALBUM */
+.cover {
+  width: 220px;
+  height: 220px;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 0 40px rgba(0,229,255,0.4);
+}
+
+/* TEXT */
 .station {
-  font-size: 18px;
+  margin-top: 20px;
+  font-size: 20px;
   font-weight: bold;
 }
 
 .now {
   opacity: 0.6;
-  font-size: 13px;
-  margin-bottom: 10px;
+  font-size: 14px;
 }
 
-/* ===== VISUALISER ===== */
+/* VISUALISER */
 canvas {
-  width: 100%;
-  height: 90px;
-  background: #000;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #222;
+  width: 90%;
+  max-width: 500px;
+  height: 100px;
+  margin-top: 20px;
 }
 
+/* AUDIO */
 audio {
+  width: 90%;
+  max-width: 500px;
+  margin-top: 15px;
+}
+
+/* GRID */
+.grid {
+  margin-top: 40px;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.card {
+  background: #111;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.card img {
   width: 100%;
+  border-radius: 10px;
 }
 </style>
-
 </head>
 
 <body>
 
-<!-- TOPBAR -->
+<div class="bg" id="bg"></div>
+
 <div class="topbar">
+  <div>📻 Zaga Radio</div>
+  <a class="btn" href="videos.html">🎬 Videos</a>
+</div>
 
-  <div class="brand">
-    📻 ZagaTV <span>Radio</span>
-  </div>
+<div class="player">
 
-  <div style="display:flex;gap:10px;align-items:center;">
+  <img id="cover" class="cover" src="img/zaga.png">
 
-    <!-- 🔥 BUTTON TO VIDEOS -->
-    <a class="btn" href="videos.html">🎬 Videos</a>
+  <div class="station" id="stationName">Select station</div>
+  <div class="now" id="nowPlaying">—</div>
 
-    <div style="opacity:0.5;font-size:13px;">Live</div>
+  <canvas id="vis"></canvas>
 
-  </div>
+  <audio id="audio" controls></audio>
 
 </div>
 
-<!-- PAGE -->
-<div class="page">
-
-  <h2 style="margin:10px 0;">Live Stations</h2>
-
-  <div class="radio-grid" id="radioGrid"></div>
-
-  <div class="player">
-    <div class="station" id="stationName">Select station</div>
-    <div class="now" id="nowPlaying">—</div>
-
-    <canvas id="vis"></canvas>
-
-    <audio id="audio" controls></audio>
-  </div>
-
-</div>
+<div class="grid" id="radioGrid"></div>
 
 <script src="js/radio.js"></script>
 </body>
