@@ -1,5 +1,8 @@
 (() => {
 
+// =========================
+// 🎵 STATIONS
+// =========================
 const stations = [
   {
     name: "Zaga Radio",
@@ -18,11 +21,15 @@ const stations = [
   }
 ];
 
-// ELEMENTS
+// =========================
+// 🎧 ELEMENTS
+// =========================
 const audio = document.getElementById("audio");
 const grid = document.getElementById("radioGrid");
+
 const stationName = document.getElementById("stationName");
 const nowPlaying = document.getElementById("nowPlaying");
+
 const cover = document.getElementById("cover");
 const bg = document.getElementById("bg");
 
@@ -38,15 +45,50 @@ const ctx = canvas.getContext("2d");
 canvas.width = 600;
 canvas.height = 100;
 
-// STATE
-let bars = new Array(40).fill(10);
-let phase = 0;
-let energy = 0;
-let playing = false;
+// =========================
+// 🎛 STATE
+// =========================
 let currentIndex = 0;
+let playing = false;
 
 // =========================
-// 🎧 VISUALISER (PRO)
+// 📊 VISUALISER STATE
+// =========================
+let audioCtx = null;
+let analyser = null;
+let source = null;
+let dataArray = null;
+let initialized = false;
+
+// =========================
+// 🔥 INIT AUDIO ANALYSER
+// =========================
+function initAudio() {
+
+  if (initialized) return;
+
+  try {
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 128;
+
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    initialized = true;
+
+  } catch (e) {
+    console.log("Audio init error:", e);
+  }
+}
+
+// =========================
+// 🎨 VISUALISER
 // =========================
 function draw() {
 
@@ -54,33 +96,26 @@ function draw() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const targetEnergy = playing ? 1 : 0;
-  energy += (targetEnergy - energy) * 0.05;
+  if (!analyser) return;
+
+  analyser.getByteFrequencyData(dataArray);
 
   let x = 0;
 
-  for (let i = 0; i < bars.length; i++) {
+  for (let i = 0; i < dataArray.length; i++) {
 
-    const wave =
-      Math.sin(i * 0.4 + phase) +
-      Math.sin(i * 0.2 - phase);
+    const v = dataArray[i];
+    const h = v * 0.6;
 
-    const beat = Math.abs(Math.sin(phase * 0.6));
-
-    let target = 20 + wave * 15 * energy + beat * 25 * energy;
-
-    bars[i] += (target - bars[i]) * 0.15;
-
-    ctx.shadowBlur = 20;
+    ctx.shadowBlur = 15;
     ctx.shadowColor = "#00e5ff";
 
     ctx.fillStyle = "#00e5ff";
-    ctx.fillRect(x, canvas.height - bars[i], 6, bars[i]);
 
-    x += 12;
+    ctx.fillRect(x, canvas.height - h, 5, h);
+
+    x += 6;
   }
-
-  phase += 0.05 + energy * 0.05;
 }
 
 draw();
@@ -112,46 +147,29 @@ function play(index) {
 
     audio.play()
       .then(() => {
+
         playing = true;
-        progress = 0;
+
+        initAudio();
+
+        if (audioCtx && audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+
       })
       .catch(err => console.log(err));
 
   }, 100);
 }
 
+// =========================
+// ⏯ AUDIO STATE
+// =========================
 audio.onpause = () => playing = false;
 audio.onended = () => playing = false;
 
 // =========================
-// 🎵 ICECAST METADATA
-// =========================
-async function fetchMetadata() {
-  try {
-    const res = await fetch("https://radio.zagatv.gr/status-json.xsl");
-    const data = await res.json();
-
-    let source = data.icestats.source;
-    let title = "Live";
-
-    if (Array.isArray(source)) {
-      title = source[0].title || "Live";
-    } else {
-      title = source.title || "Live";
-    }
-
-    nowPlaying.textContent = title;
-    miniNow.textContent = title;
-
-  } catch (e) {
-    nowPlaying.textContent = "Live";
-  }
-}
-
-setInterval(fetchMetadata, 10000);
-
-// =========================
-// ⏱ PROGRESS BAR (FAKE)
+// ⏱ FAKE PROGRESS
 // =========================
 let progress = 0;
 
@@ -159,9 +177,7 @@ function animateProgress() {
 
   if (playing) {
     progress += 0.25;
-
     if (progress > 100) progress = 0;
-
     progressBar.style.width = progress + "%";
   }
 
@@ -171,7 +187,7 @@ function animateProgress() {
 animateProgress();
 
 // =========================
-// 👉 SWIPE MOBILE
+// 📱 SWIPE
 // =========================
 let startX = 0;
 
@@ -181,25 +197,22 @@ document.addEventListener("touchstart", e => {
 
 document.addEventListener("touchend", e => {
 
-  let endX = e.changedTouches[0].clientX;
-  let diff = endX - startX;
+  const diff = e.changedTouches[0].clientX - startX;
 
   if (diff > 50) {
-    // previous
-    let prev = (currentIndex - 1 + stations.length) % stations.length;
+    const prev = (currentIndex - 1 + stations.length) % stations.length;
     play(prev);
   }
 
   if (diff < -50) {
-    // next
-    let next = (currentIndex + 1) % stations.length;
+    const next = (currentIndex + 1) % stations.length;
     play(next);
   }
 
 });
 
 // =========================
-// GRID UI
+// 🧱 GRID UI
 // =========================
 stations.forEach((s, i) => {
 
