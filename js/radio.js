@@ -7,9 +7,9 @@
       logo: "img/zaga.png"
     },
     {
-      name: "Chillhop",
-      url: "https://streams.ilovemusic.de/iloveradio16.mp3",
-      logo: "img/chillhop.png"
+      name: "ZuccaRadio",
+      url: "https://stream.zuccaradio.com/stream.mp3",
+      logo: "img/zucca_radio.png"
     },
     {
       name: "LoFi Radio",
@@ -33,13 +33,15 @@
   let analyser;
   let source;
   let dataArray;
+  let started = false;
 
   // =========================
-  // VISUALISER
+  // INIT AUDIO GRAPH (IMPORTANT FIX)
   // =========================
   function initAudio() {
 
-    if (audioCtx) return;
+    if (started) return;
+    started = true;
 
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -55,6 +57,9 @@
     draw();
   }
 
+  // =========================
+  // VISUALISER
+  // =========================
   function draw() {
 
     requestAnimationFrame(draw);
@@ -80,7 +85,7 @@
   }
 
   // =========================
-  // PLAY
+  // PLAY FIX (IMPORTANT)
   // =========================
   function play(s) {
 
@@ -92,18 +97,21 @@
 
     audio.play().then(() => {
 
+      // ⚠️ MUST be triggered AFTER user click + play success
       initAudio();
 
-      if (audioCtx.state === "suspended") {
+      if (audioCtx && audioCtx.state === "suspended") {
         audioCtx.resume();
       }
 
+    }).catch(err => {
+      console.log("Play error:", err);
     });
 
   }
 
   // =========================
-  // RENDER GRID
+  // UI
   // =========================
   stations.forEach(s => {
 
