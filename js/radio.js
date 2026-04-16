@@ -1,7 +1,7 @@
 (() => {
 
 // =========================
-// 🎵 STATIONS
+// STATIONS
 // =========================
 const stations = [
   {
@@ -22,7 +22,7 @@ const stations = [
 ];
 
 // =========================
-// 🎧 ELEMENTS
+// ELEMENTS
 // =========================
 const audio = document.getElementById("audio");
 const grid = document.getElementById("radioGrid");
@@ -33,21 +33,26 @@ const nowPlaying = document.getElementById("nowPlaying");
 const cover = document.getElementById("cover");
 const bg = document.getElementById("bg");
 
-// =========================
-// 🎛 STATE
-// =========================
-let currentIndex = 0;
-let playing = false;
+const playBtn = document.getElementById("playBtn");
 
-// =========================
-// 🎨 SIMPLE SAFE VISUALISER (NO AUDIO BUGS)
-// =========================
 const canvas = document.getElementById("vis");
 const ctx = canvas.getContext("2d");
+
+const progressBar = document.getElementById("progressBar");
 
 canvas.width = 600;
 canvas.height = 100;
 
+// =========================
+// STATE
+// =========================
+let currentIndex = 0;
+let playing = false;
+let progress = 0;
+
+// =========================
+// VISUALISER (SMOOTH + CENTERED)
+// =========================
 let bars = new Array(40).fill(5);
 
 function draw() {
@@ -56,32 +61,33 @@ function draw() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let x = 0;
+  const center = canvas.width / 2;
 
-  const target = playing ? 1 : 0;
+  let x = 0;
 
   for (let i = 0; i < bars.length; i++) {
 
-    const h = target
-      ? Math.random() * 60 + 10
-      : 3;
+    const wave =
+      Math.sin(i * 0.3 + performance.now() * 0.002) * 10;
 
-    bars[i] += (h - bars[i]) * 0.2;
+    const target = playing ? 20 + wave : 3;
 
-    ctx.shadowBlur = 10;
+    bars[i] += (target - bars[i]) * 0.1;
+
+    const drawX = center + (i - bars.length / 2) * 10;
+
+    ctx.shadowBlur = 12;
     ctx.shadowColor = "#00e5ff";
     ctx.fillStyle = "#00e5ff";
 
-    ctx.fillRect(x, canvas.height - bars[i], 6, bars[i]);
-
-    x += 12;
+    ctx.fillRect(drawX, canvas.height / 2 - bars[i] / 2, 6, bars[i]);
   }
 }
 
 draw();
 
 // =========================
-// ▶ PLAY (SAFE)
+// PLAY
 // =========================
 function play(index) {
 
@@ -105,22 +111,61 @@ function play(index) {
     audio.play()
       .then(() => {
         playing = true;
+        playBtn.textContent = "❚❚";
       })
-      .catch(err => {
-        console.log("PLAY ERROR:", err);
-      });
+      .catch(console.log);
 
   }, 100);
 }
 
 // =========================
-// ⏯ STATE
+// BUTTON
 // =========================
-audio.onpause = () => playing = false;
-audio.onended = () => playing = false;
+playBtn.onclick = () => {
+
+  if (audio.paused) {
+    audio.play();
+    playing = true;
+    playBtn.textContent = "❚❚";
+  } else {
+    audio.pause();
+    playing = false;
+    playBtn.textContent = "▶";
+  }
+
+};
 
 // =========================
-// 🧱 GRID
+// STATE EVENTS
+// =========================
+audio.onpause = () => {
+  playing = false;
+  playBtn.textContent = "▶";
+};
+
+audio.onended = () => {
+  playing = false;
+  playBtn.textContent = "▶";
+};
+
+// =========================
+// PROGRESS (FAKE SPOTIFY)
+// =========================
+function animateProgress() {
+
+  if (playing) {
+    progress += 0.2;
+    if (progress > 100) progress = 0;
+    progressBar.style.width = progress + "%";
+  }
+
+  requestAnimationFrame(animateProgress);
+}
+
+animateProgress();
+
+// =========================
+// GRID
 // =========================
 stations.forEach((s, i) => {
 
