@@ -18,6 +18,7 @@ const stations = [
   }
 ];
 
+// ELEMENTS
 const audio = document.getElementById("audio");
 const grid = document.getElementById("radioGrid");
 const stationName = document.getElementById("stationName");
@@ -25,18 +26,28 @@ const nowPlaying = document.getElementById("nowPlaying");
 const cover = document.getElementById("cover");
 const bg = document.getElementById("bg");
 
+const miniCover = document.getElementById("miniCover");
+const miniTitle = document.getElementById("miniTitle");
+const miniNow = document.getElementById("miniNow");
+
+const progressBar = document.getElementById("progressBar");
+
 const canvas = document.getElementById("vis");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 600;
 canvas.height = 100;
 
+// STATE
 let bars = new Array(40).fill(10);
 let phase = 0;
 let energy = 0;
 let playing = false;
+let currentIndex = 0;
 
-/* VISUALISER */
+// =========================
+// 🎧 VISUALISER (PRO)
+// =========================
 function draw() {
 
   requestAnimationFrame(draw);
@@ -74,8 +85,13 @@ function draw() {
 
 draw();
 
-/* PLAY */
-function play(s) {
+// =========================
+// ▶ PLAY
+// =========================
+function play(index) {
+
+  const s = stations[index];
+  currentIndex = index;
 
   stationName.textContent = s.name;
   nowPlaying.textContent = "LIVE";
@@ -83,16 +99,23 @@ function play(s) {
   cover.src = s.logo;
   bg.style.backgroundImage = `url(${s.logo})`;
 
+  miniCover.src = s.logo;
+  miniTitle.textContent = s.name;
+
   audio.pause();
   audio.src = "";
   audio.load();
 
   setTimeout(() => {
+
     audio.src = s.url;
 
-    audio.play().then(() => {
-      playing = true;
-    });
+    audio.play()
+      .then(() => {
+        playing = true;
+        progress = 0;
+      })
+      .catch(err => console.log(err));
 
   }, 100);
 }
@@ -100,8 +123,85 @@ function play(s) {
 audio.onpause = () => playing = false;
 audio.onended = () => playing = false;
 
-/* GRID */
-stations.forEach(s => {
+// =========================
+// 🎵 ICECAST METADATA
+// =========================
+async function fetchMetadata() {
+  try {
+    const res = await fetch("https://radio.zagatv.gr/status-json.xsl");
+    const data = await res.json();
+
+    let source = data.icestats.source;
+    let title = "Live";
+
+    if (Array.isArray(source)) {
+      title = source[0].title || "Live";
+    } else {
+      title = source.title || "Live";
+    }
+
+    nowPlaying.textContent = title;
+    miniNow.textContent = title;
+
+  } catch (e) {
+    nowPlaying.textContent = "Live";
+  }
+}
+
+setInterval(fetchMetadata, 10000);
+
+// =========================
+// ⏱ PROGRESS BAR (FAKE)
+// =========================
+let progress = 0;
+
+function animateProgress() {
+
+  if (playing) {
+    progress += 0.25;
+
+    if (progress > 100) progress = 0;
+
+    progressBar.style.width = progress + "%";
+  }
+
+  requestAnimationFrame(animateProgress);
+}
+
+animateProgress();
+
+// =========================
+// 👉 SWIPE MOBILE
+// =========================
+let startX = 0;
+
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e => {
+
+  let endX = e.changedTouches[0].clientX;
+  let diff = endX - startX;
+
+  if (diff > 50) {
+    // previous
+    let prev = (currentIndex - 1 + stations.length) % stations.length;
+    play(prev);
+  }
+
+  if (diff < -50) {
+    // next
+    let next = (currentIndex + 1) % stations.length;
+    play(next);
+  }
+
+});
+
+// =========================
+// GRID UI
+// =========================
+stations.forEach((s, i) => {
 
   const div = document.createElement("div");
   div.className = "card";
@@ -111,7 +211,7 @@ stations.forEach(s => {
     <div style="margin-top:5px;">${s.name}</div>
   `;
 
-  div.onclick = () => play(s);
+  div.onclick = () => play(i);
 
   grid.appendChild(div);
 
