@@ -29,16 +29,17 @@
   canvas.width = 800;
   canvas.height = 100;
 
-  let analyser, audioCtx, source, dataArray;
-  let started = false;
+  let audioCtx = null;
+  let analyser = null;
+  let source = null;
+  let dataArray = null;
 
   // =========================
-  // INIT VISUAL ONLY WHEN NEEDED
+  // CREATE AUDIO GRAPH (SAFE)
   // =========================
-  function initAudioGraph() {
+  function ensureAudioGraph() {
 
-    if (started) return;
-    started = true;
+    if (audioCtx) return;
 
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -69,51 +70,54 @@
 
     let x = 0;
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) {
 
       const v = dataArray[i];
-      const h = v / 1.4;
+      const h = v / 1.3;
 
       ctx.fillStyle = "#00e5ff";
-      ctx.fillRect(x, canvas.height - h, 6, h);
+      ctx.fillRect(x, canvas.height - h, 5, h);
 
-      x += 14;
+      x += 12;
     }
   }
 
   // =========================
-  // 🔥 SAFE PLAY (FIXED AUDIO PIPELINE)
+  // 🔥 FIXED PLAY (MOST IMPORTANT PART)
   // =========================
   function play(s) {
 
     stationName.textContent = s.name;
     nowPlaying.textContent = "Live";
 
-    // HARD RESET AUDIO
+    // IMPORTANT: STOP old stream cleanly
     audio.pause();
-    audio.src = "";
+    audio.removeAttribute("src");
     audio.load();
 
+    // small delay avoids Chrome audio bug
     setTimeout(() => {
 
       audio.src = s.url;
 
-      audio.play()
-        .then(() => {
+      const p = audio.play();
 
-          // init visualiser AFTER success
-          initAudioGraph();
+      if (p !== undefined) {
+        p.then(() => {
+
+          // ONLY INIT AFTER CONFIRMED PLAY
+          ensureAudioGraph();
 
           if (audioCtx && audioCtx.state === "suspended") {
             audioCtx.resume();
           }
 
-        })
-        .catch(err => {
-          console.log("PLAY ERROR:", err);
+        }).catch(err => {
+          console.log("PLAY BLOCKED:", err);
         });
+      }
 
-    }, 100);
+    }, 150);
 
   }
 
