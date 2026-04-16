@@ -2,7 +2,7 @@
 
   const stations = [
     {
-      name: "Zaga Radio (Live)",
+      name: "Zaga Radio",
       url: "https://radio.zagatv.gr/radio.mp3",
       logo: "img/zaga.png"
     },
@@ -34,7 +34,12 @@
   // =========================
   // FAKE VISUALISER (SMOOTH)
   // =========================
-let bars = new Array(50).fill(5);
+const BAR_COUNT = 40;
+const GROUP_SIZE = 4;
+
+let bars = new Array(BAR_COUNT).fill(10);
+let phase = 0;
+let energy = 0;
 
 function draw() {
 
@@ -42,28 +47,53 @@ function draw() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // energy ανεβαίνει όταν παίζει
+  const targetEnergy = playing ? 1 : 0;
+  energy += (targetEnergy - energy) * 0.05;
+
   let x = 0;
 
-  // παίρνουμε volume από audio
-  const volume = audio.paused ? 0 : (audio.volume || 1);
+  for (let i = 0; i < BAR_COUNT; i++) {
 
-  for (let i = 0; i < bars.length; i++) {
+    // GROUPED BARS (Spotify style)
+    const groupIndex = Math.floor(i / GROUP_SIZE);
 
-    // smooth target height (όχι random spam)
-    let target = playing
-      ? (Math.random() * 50 + 10) * volume
-      : 5;
+    // waveform βάση (ημιτονοειδές)
+    const wave =
+      Math.sin((i * 0.4) + phase) * 0.5 +
+      Math.sin((i * 0.2) - phase * 1.2) * 0.5;
 
-    // smooth transition (key fix)
-    bars[i] += (target - bars[i]) * 0.1;
+    // beat pulse (slow)
+    const beat = Math.abs(Math.sin(phase * 0.6));
 
-    ctx.fillStyle = "#00e5ff";
+    // τελικό target ύψος
+    let target =
+      20 +
+      wave * 25 * energy +
+      beat * 30 * energy;
+
+    // smooth interpolation
+    bars[i] += (target - bars[i]) * 0.15;
+
+    // 🔥 GLOW EFFECT
+    const glow = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    glow.addColorStop(0, "#00e5ff");
+    glow.addColorStop(1, "#0088ff");
+
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#00e5ff";
+    ctx.fillStyle = glow;
+
     ctx.fillRect(x, canvas.height - bars[i], 6, bars[i]);
 
-    x += 14;
+    x += 12;
   }
+
+  // advance animation
+  phase += 0.05 + energy * 0.05;
 }
-  draw();
+
+draw();
   // =========================
   // PLAY
   // =========================
