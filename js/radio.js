@@ -3,25 +3,28 @@
   const stations = [
     {
       name: "Zaga Radio (Live)",
-      url: "https://radio.zagatv.gr/radio.mp3"
+      url: "https://radio.zagatv.gr/radio.mp3",
+      logo: "img/zaga.png"
     },
     {
       name: "Chillhop",
-      url: "https://streams.ilovemusic.de/iloveradio16.mp3"
+      url: "https://streams.ilovemusic.de/iloveradio16.mp3",
+      logo: "img/chillhop.png"
     },
     {
       name: "LoFi Radio",
-      url: "https://shorturl.at/KPUUR"
+      url: "https://shorturl.at/KPUUR",
+      logo: "img/lofi.png"
     }
   ];
 
   const grid = document.getElementById("radioGrid");
   const audio = document.getElementById("audio");
   const stationName = document.getElementById("stationName");
+  const nowPlaying = document.getElementById("nowPlaying");
+
   const canvas = document.getElementById("vis");
   const ctx = canvas.getContext("2d");
-
-  const now = document.getElementById("nowPlaying");
 
   canvas.width = 800;
   canvas.height = 100;
@@ -32,9 +35,9 @@
   let dataArray;
 
   // =========================
-  // VISUALISER (SPOTIFY STYLE)
+  // VISUALISER
   // =========================
-  function initAudioGraph() {
+  function initAudio() {
 
     if (audioCtx) return;
 
@@ -77,19 +80,19 @@
   }
 
   // =========================
-  // PLAY STATION
+  // PLAY
   // =========================
   function play(s) {
 
     stationName.textContent = s.name;
-    now.textContent = "Live";
+    nowPlaying.textContent = "Live";
 
     audio.src = s.url;
     audio.load();
 
     audio.play().then(() => {
 
-      initAudioGraph();
+      initAudio();
 
       if (audioCtx.state === "suspended") {
         audioCtx.resume();
@@ -108,8 +111,13 @@
     div.className = "card";
 
     div.innerHTML = `
-      <b>📻 ${s.name}</b>
-      <div style="opacity:0.6;font-size:12px;margin-top:6px;">Click to play</div>
+      <div class="card-inner">
+        <img src="${s.logo}" />
+        <div>
+          <div><b>📻 ${s.name}</b></div>
+          <div style="opacity:0.6;font-size:12px;">Click to play</div>
+        </div>
+      </div>
     `;
 
     div.onclick = () => play(s);
