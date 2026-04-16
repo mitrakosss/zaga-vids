@@ -9,36 +9,27 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Century Gothic;
   background: #0b0b0b;
   color: white;
   overflow-x: hidden;
 }
 
-/* BACKGROUND BLUR */
+/* BACKGROUND */
 .bg {
   position: fixed;
   inset: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(40px) brightness(0.4);
+  filter: blur(35px) brightness(0.4);
   z-index: -1;
-  transition: 0.5s;
 }
 
-/* TOPBAR */
+/* TOP */
 .topbar {
   display: flex;
   justify-content: space-between;
   padding: 12px 16px;
-}
-
-.btn {
-  background: #1f1f1f;
-  padding: 6px 12px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: white;
 }
 
 /* PLAYER */
@@ -49,25 +40,37 @@ body {
   margin-top: 40px;
 }
 
-/* ALBUM */
 .cover {
-  width: 220px;
-  height: 220px;
+  width: 200px;
+  height: 200px;
   border-radius: 20px;
   object-fit: cover;
-  box-shadow: 0 0 40px rgba(0,229,255,0.4);
+  box-shadow: 0 0 30px rgba(0,229,255,0.4);
 }
 
 /* TEXT */
 .station {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 20px;
   font-weight: bold;
 }
 
 .now {
   opacity: 0.6;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+/* PLAY BUTTON */
+.play-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #00e5ff;
+  color: #000;
+  font-size: 20px;
+  margin-top: 15px;
+  cursor: pointer;
 }
 
 /* VISUALISER */
@@ -76,13 +79,6 @@ canvas {
   max-width: 500px;
   height: 100px;
   margin-top: 20px;
-}
-
-/* AUDIO */
-audio {
-  width: 90%;
-  max-width: 500px;
-  margin-top: 15px;
 }
 
 /* GRID */
@@ -106,6 +102,23 @@ audio {
   width: 100%;
   border-radius: 10px;
 }
+
+/* PROGRESS */
+.progress {
+  width: 90%;
+  max-width: 500px;
+  height: 4px;
+  background: #222;
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: #00e5ff;
+}
 </style>
 </head>
 
@@ -115,7 +128,6 @@ audio {
 
 <div class="topbar">
   <div>📻 Zaga Radio</div>
-  <a class="btn" href="videos.html">🎬 Videos</a>
 </div>
 
 <div class="player">
@@ -125,22 +137,15 @@ audio {
   <div class="station" id="stationName">Select station</div>
   <div class="now" id="nowPlaying">—</div>
 
+  <button id="playBtn" class="play-btn">▶</button>
+
   <canvas id="vis"></canvas>
 
-  <audio id="audio" controls></audio>
- 
   <div class="progress">
-  <div class="bar" id="progressBar"></div>
-</div>
-
-<!-- STICKY PLAYER -->
-<div class="mini-player" id="miniPlayer">
-  <img id="miniCover">
-  <div>
-    <div id="miniTitle">—</div>
-    <div id="miniNow">—</div>
+    <div class="bar" id="progressBar"></div>
   </div>
-</div>
+
+  <audio id="audio"></audio>
 
 </div>
 
