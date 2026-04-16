@@ -1,8 +1,5 @@
 (() => {
 
-// =========================
-// STATIONS
-// =========================
 const stations = [
   {
     name: "Zaga Radio",
@@ -21,9 +18,7 @@ const stations = [
   }
 ];
 
-// =========================
 // ELEMENTS
-// =========================
 const audio = document.getElementById("audio");
 const grid = document.getElementById("radioGrid");
 
@@ -35,26 +30,19 @@ const bg = document.getElementById("bg");
 
 const playBtn = document.getElementById("playBtn");
 
+// VISUALISER
 const canvas = document.getElementById("vis");
 const ctx = canvas.getContext("2d");
-
-const progressBar = document.getElementById("progressBar");
 
 canvas.width = 600;
 canvas.height = 100;
 
-// =========================
 // STATE
-// =========================
 let currentIndex = 0;
 let playing = false;
-let progress = 0;
-
-// =========================
-// VISUALISER (SMOOTH + CENTERED)
-// =========================
 let bars = new Array(40).fill(5);
 
+// VISUALISER (smooth + centered)
 function draw() {
 
   requestAnimationFrame(draw);
@@ -63,36 +51,31 @@ function draw() {
 
   const center = canvas.width / 2;
 
-  let x = 0;
-
   for (let i = 0; i < bars.length; i++) {
 
-    const wave =
-      Math.sin(i * 0.3 + performance.now() * 0.002) * 10;
+    const wave = Math.sin(i * 0.3 + performance.now() * 0.002);
 
-    const target = playing ? 20 + wave : 3;
+    const target = playing ? 20 + wave * 15 : 3;
 
     bars[i] += (target - bars[i]) * 0.1;
 
-    const drawX = center + (i - bars.length / 2) * 10;
+    const x = center + (i - bars.length / 2) * 10;
 
     ctx.shadowBlur = 12;
     ctx.shadowColor = "#00e5ff";
     ctx.fillStyle = "#00e5ff";
 
-    ctx.fillRect(drawX, canvas.height / 2 - bars[i] / 2, 6, bars[i]);
+    ctx.fillRect(x, canvas.height / 2 - bars[i] / 2, 6, bars[i]);
   }
 }
 
 draw();
 
-// =========================
 // PLAY
-// =========================
-function play(index) {
+function play(i) {
 
-  const s = stations[index];
-  currentIndex = index;
+  const s = stations[i];
+  currentIndex = i;
 
   stationName.textContent = s.name;
   nowPlaying.textContent = "LIVE";
@@ -118,9 +101,7 @@ function play(index) {
   }, 100);
 }
 
-// =========================
 // BUTTON
-// =========================
 playBtn.onclick = () => {
 
   if (audio.paused) {
@@ -135,9 +116,7 @@ playBtn.onclick = () => {
 
 };
 
-// =========================
-// STATE EVENTS
-// =========================
+// STATE
 audio.onpause = () => {
   playing = false;
   playBtn.textContent = "▶";
@@ -148,25 +127,7 @@ audio.onended = () => {
   playBtn.textContent = "▶";
 };
 
-// =========================
-// PROGRESS (FAKE SPOTIFY)
-// =========================
-function animateProgress() {
-
-  if (playing) {
-    progress += 0.2;
-    if (progress > 100) progress = 0;
-    progressBar.style.width = progress + "%";
-  }
-
-  requestAnimationFrame(animateProgress);
-}
-
-animateProgress();
-
-// =========================
 // GRID
-// =========================
 stations.forEach((s, i) => {
 
   const div = document.createElement("div");
@@ -174,7 +135,7 @@ stations.forEach((s, i) => {
 
   div.innerHTML = `
     <img src="${s.logo}">
-    <div style="margin-top:5px;">${s.name}</div>
+    <div style="margin-top:8px;">${s.name}</div>
   `;
 
   div.onclick = () => play(i);
