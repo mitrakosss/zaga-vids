@@ -1,20 +1,16 @@
 (() => {
   const stations = [
     {
+      name: "Zaga Radio (My Icecast)",
+      url: "https://radio.zagatv.gr/radio.mp3"
+    },
+    {
       name: "LoFi Radio",
-      url: "https://streams.ilovemusic.de/iloveradio17.mp3"
+      url: "https://shorturl.at/KPUUR"
     },
     {
-      name: "BBC World Service",
-      url: "https://stream.live.vc.bbcmedia.co.uk/bbc_world_service"
-    },
-    {
-      name: "Classical Radio",
-      url: "https://ice1.somafm.com/groovesalad-128-mp3"
-    },
-    {
-      name: "Chillhop",
-      url: "https://streams.ilovemusic.de/iloveradio16.mp3"
+      name: "ZuccaRadio",
+      url: "https://stream.zuccaradio.com/stream?"
     }
   ];
 
@@ -22,10 +18,70 @@
   const audio = document.getElementById("audioPlayer");
   const title = document.getElementById("stationName");
 
+  // =========================
+  // 🎧 AUDIO VISUALISER SETUP
+  // =========================
+  const canvas = document.createElement("canvas");
+  canvas.id = "visualiser";
+  canvas.width = 600;
+  canvas.height = 120;
+  canvas.style.width = "100%";
+  canvas.style.maxWidth = "600px";
+  canvas.style.display = "block";
+  canvas.style.margin = "10px auto";
+
+  const playerBox = document.getElementById("playerBox");
+  playerBox.insertBefore(canvas, audio);
+
+  const ctx = canvas.getContext("2d");
+
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function draw() {
+    requestAnimationFrame(draw);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const barWidth = (canvas.width / bufferLength) * 1.5;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+      const barHeight = dataArray[i];
+
+      ctx.fillStyle = "rgba(0, 200, 255, 0.8)";
+      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+      x += barWidth + 1;
+    }
+  }
+
+  draw();
+
+  // =========================
+  // 🎵 RADIO LOGIC
+  // =========================
   function playStation(station) {
     title.textContent = station.name;
     audio.src = station.url;
-    audio.play().catch(() => {});
+
+    audio.play().then(() => {
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }).catch(() => {});
   }
 
   function renderStations() {
@@ -33,7 +89,7 @@
 
     stations.forEach(station => {
       const card = document.createElement("div");
-      card.className = "video-container"; // reuse same style
+      card.className = "video-container";
 
       card.innerHTML = `
         <div class="overlay" style="opacity:1; position:relative;">

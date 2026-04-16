@@ -584,3 +584,18 @@ body.modal-open .topbar {
   width: 100%;
   margin-top: 10px;
 }
+
+.visualiser {
+  width: 100%;
+  height: 80px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#visualiser {
+  width: 100%;
+  height: 80px;
+  background: transparent;
+}
