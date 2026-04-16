@@ -34,30 +34,35 @@
   // =========================
   // FAKE VISUALISER (SMOOTH)
   // =========================
-  function draw() {
+let bars = new Array(50).fill(5);
 
-    requestAnimationFrame(draw);
+function draw() {
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  requestAnimationFrame(draw);
 
-    let x = 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < 50; i++) {
+  let x = 0;
 
-      // random αλλά smooth
-      const h = playing
-        ? Math.random() * 80 + 10
-        : 5;
+  // παίρνουμε volume από audio
+  const volume = audio.paused ? 0 : (audio.volume || 1);
 
-      ctx.fillStyle = "#00e5ff";
-      ctx.fillRect(x, canvas.height - h, 6, h);
+  for (let i = 0; i < bars.length; i++) {
 
-      x += 14;
-    }
+    // smooth target height (όχι random spam)
+    let target = playing
+      ? (Math.random() * 50 + 10) * volume
+      : 5;
+
+    // smooth transition (key fix)
+    bars[i] += (target - bars[i]) * 0.1;
+
+    ctx.fillStyle = "#00e5ff";
+    ctx.fillRect(x, canvas.height - bars[i], 6, bars[i]);
+
+    x += 14;
   }
-
-  draw();
-
+}
   // =========================
   // PLAY
   // =========================
