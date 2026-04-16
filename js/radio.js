@@ -1,108 +1,114 @@
-(() => {
-  const stations = [
-    {
-      name: "Zaga Radio (My Icecast)",
-      url: "https://radio.zagatv.gr/radio.mp3"
-    },
-    {
-      name: "LoFi Radio",
-      url: "https://shorturl.at/KPUUR"
-    },
-    {
+const audio = document.getElementById("audio");
+const canvas = document.getElementById("vis");
+const ctx = canvas.getContext("2d");
+
+const now = document.getElementById("now");
+const stationEl = document.getElementById("station");
+const bg = document.getElementById("bg");
+
+canvas.width = 800;
+canvas.height = 120;
+
+// =========================
+// 3 STATIONS
+// =========================
+const stations = [
+  {
+    name: "Zaga Radio (Live)",
+    url: "https://radio.zagatv.gr/radio.mp3"
+  },
+  {
+    name: "Chillhop",
+    url: "https://streams.ilovemusic.de/iloveradio16.mp3"
+  },
+	{
       name: "ZuccaRadio",
-      url: "https://stream.zuccaradio.com/stream?"
+      url: "https://stream.zuccaradio.com/stream.mp3"
     }
-  ];
+];
 
-  const grid = document.getElementById("radioGrid");
-  const audio = document.getElementById("audioPlayer");
-  const title = document.getElementById("stationName");
+let current = stations[0];
 
-  // =========================
-  // 🎧 AUDIO VISUALISER SETUP
-  // =========================
-  const canvas = document.createElement("canvas");
-  canvas.id = "visualiser";
-  canvas.width = 600;
-  canvas.height = 120;
-  canvas.style.width = "100%";
-  canvas.style.maxWidth = "600px";
-  canvas.style.display = "block";
-  canvas.style.margin = "10px auto";
+// =========================
+// AUDIO VISUALISER
+// =========================
+let audioCtx;
+let analyser;
+let source;
+let dataArray;
 
-  const playerBox = document.getElementById("playerBox");
-  playerBox.insertBefore(canvas, audio);
+function initAudio() {
 
-  const ctx = canvas.getContext("2d");
+  if (audioCtx) return;
 
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  const audioCtx = new AudioContext();
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  const analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 512;
 
-  const source = audioCtx.createMediaElementSource(audio);
+  source = audioCtx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
 
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  function draw() {
-    requestAnimationFrame(draw);
-
-    analyser.getByteFrequencyData(dataArray);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const barWidth = (canvas.width / bufferLength) * 1.5;
-    let x = 0;
-
-    for (let i = 0; i < bufferLength; i++) {
-      const barHeight = dataArray[i];
-
-      ctx.fillStyle = "rgba(0, 200, 255, 0.8)";
-      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-
-      x += barWidth + 1;
-    }
-  }
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
 
   draw();
+}
 
-  // =========================
-  // 🎵 RADIO LOGIC
-  // =========================
-  function playStation(station) {
-    title.textContent = station.name;
-    audio.src = station.url;
+// =========================
+// SPOTIFY STYLE VISUALISER
+// =========================
+function draw() {
 
-    audio.play().then(() => {
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
-    }).catch(() => {});
+  requestAnimationFrame(draw);
+
+  if (!analyser) return;
+
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let x = 0;
+
+  for (let i = 0; i < 60; i++) {
+
+    const v = dataArray[i];
+    const h = v / 1.3;
+
+    ctx.fillStyle = "#00e5ff";
+    ctx.fillRect(x, 120 - h, 6, h);
+
+    x += 12;
   }
 
-  function renderStations() {
-    grid.innerHTML = "";
+  const avg = dataArray.reduce((a,b)=>a+b,0)/dataArray.length;
+  bg.style.filter = `blur(${20 + avg/12}px) brightness(0.4)`;
+}
 
-    stations.forEach(station => {
-      const card = document.createElement("div");
-      card.className = "video-container";
+// =========================
+// PLAY STATION
+// =========================
+function playStation(s) {
 
-      card.innerHTML = `
-        <div class="overlay" style="opacity:1; position:relative;">
-          <div class="title">📻 ${station.name}</div>
-          <div class="date">Click to play</div>
-        </div>
-      `;
+  current = s;
 
-      card.addEventListener("click", () => playStation(station));
+  stationEl.textContent = s.name;
 
-      grid.appendChild(card);
-    });
-  }
+  audio.src = s.url;
+  audio.load();
 
-  renderStations();
-})();
+  audio.play().then(() => {
+
+    initAudio();
+
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+
+  });
+
+}
+
+// =========================
+// UI BUTTONS (AUTO)
+// =================

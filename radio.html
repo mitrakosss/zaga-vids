@@ -1,54 +1,99 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <title>Zaga - Radio</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="img/logo.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<title>Zaga Radio</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: black;
+  color: white;
+  overflow: hidden;
+}
+
+.bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('img/logo.png') center/cover no-repeat;
+  filter: blur(30px) brightness(0.4);
+  transform: scale(1.2);
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.top {
+  text-align: center;
+  padding: 20px;
+}
+
+.now {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+.station {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+canvas {
+  width: 100%;
+  height: 120px;
+}
+
+.controls {
+  padding: 20px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #00e5ff;
+  font-size: 18px;
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    
-    <a class="brand" href="videos.html">
-      <img src="img/logo.png" alt="Zaga">
-      <div class="title">
-        <b>ZagaTV</b>
-        <span>Radio</span>
-      </div>
-    </a>
+<div class="bg" id="bg"></div>
 
-    <div class="search-container"></div>
+<div class="app">
 
-    <div class="right-actions">
-      <a class="btn" href="videos.html">Videos</a>
-      <div class="pill">📻 Radio</div>
-    </div>
-
-  </div>
-</div>
-
-<div class="page">
-
-  <h2 style="margin:10px 0;">Live Radio</h2>
-
-  <div class="radio-grid" id="radioGrid"></div>
-
-  <div class="radio-player" id="playerBox">
-  <h3 id="stationName">Select a station</h3>
-
-  <div class="visualiser">
-    <canvas id="visualiser"></canvas>
+  <div class="top">
+    <div class="station" id="station">Zaga Radio</div>
+    <div class="now" id="now">Loading...</div>
   </div>
 
-  <audio id="audioPlayer" controls></audio>
-</div>
+  <canvas id="vis"></canvas>
+
+  <div class="controls">
+    <button onclick="toggle()">▶ Play / Pause</button>
+  </div>
 
 </div>
 
-<script src="js/radio.js"></script>
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script src="js/radio-pro.js"></script>
+
 </body>
 </html>
