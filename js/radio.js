@@ -15,7 +15,12 @@ const stations = [
     name: "LoFi Radio",
     url: "https://shorturl.at/KPUUR",
     logo: "img/lofi.png"
-  }
+  },
+   {
+    name: "SportFM",
+    url: "https://sportfm.live24.gr/sportfm7712",
+    logo: "img/sportfm.png"
+   }
 ];
 
 // ELEMENTS
