@@ -33,18 +33,6 @@ const nowPlaying = document.getElementById("nowPlaying");
 const cover = document.getElementById("cover");
 const bg = document.getElementById("bg");
 
-const miniCover = document.getElementById("miniCover");
-const miniTitle = document.getElementById("miniTitle");
-const miniNow = document.getElementById("miniNow");
-
-const progressBar = document.getElementById("progressBar");
-
-const canvas = document.getElementById("vis");
-const ctx = canvas.getContext("2d");
-
-canvas.width = 600;
-canvas.height = 100;
-
 // =========================
 // 🎛 STATE
 // =========================
@@ -52,76 +40,48 @@ let currentIndex = 0;
 let playing = false;
 
 // =========================
-// 📊 VISUALISER STATE
+// 🎨 SIMPLE SAFE VISUALISER (NO AUDIO BUGS)
 // =========================
-let audioCtx = null;
-let analyser = null;
-let source = null;
-let dataArray = null;
-let initialized = false;
+const canvas = document.getElementById("vis");
+const ctx = canvas.getContext("2d");
 
-// =========================
-// 🔥 INIT AUDIO ANALYSER
-// =========================
-function initAudio() {
+canvas.width = 600;
+canvas.height = 100;
 
-  if (initialized) return;
+let bars = new Array(40).fill(5);
 
-  try {
-
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 128;
-
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    initialized = true;
-
-  } catch (e) {
-    console.log("Audio init error:", e);
-  }
-}
-
-// =========================
-// 🎨 VISUALISER
-// =========================
 function draw() {
 
   requestAnimationFrame(draw);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (!analyser) return;
-
-  analyser.getByteFrequencyData(dataArray);
-
   let x = 0;
 
-  for (let i = 0; i < dataArray.length; i++) {
+  const target = playing ? 1 : 0;
 
-    const v = dataArray[i];
-    const h = v * 0.6;
+  for (let i = 0; i < bars.length; i++) {
 
-    ctx.shadowBlur = 15;
+    const h = target
+      ? Math.random() * 60 + 10
+      : 3;
+
+    bars[i] += (h - bars[i]) * 0.2;
+
+    ctx.shadowBlur = 10;
     ctx.shadowColor = "#00e5ff";
-
     ctx.fillStyle = "#00e5ff";
 
-    ctx.fillRect(x, canvas.height - h, 5, h);
+    ctx.fillRect(x, canvas.height - bars[i], 6, bars[i]);
 
-    x += 6;
+    x += 12;
   }
 }
 
 draw();
 
 // =========================
-// ▶ PLAY
+// ▶ PLAY (SAFE)
 // =========================
 function play(index) {
 
@@ -134,9 +94,6 @@ function play(index) {
   cover.src = s.logo;
   bg.style.backgroundImage = `url(${s.logo})`;
 
-  miniCover.src = s.logo;
-  miniTitle.textContent = s.name;
-
   audio.pause();
   audio.src = "";
   audio.load();
@@ -147,72 +104,23 @@ function play(index) {
 
     audio.play()
       .then(() => {
-
         playing = true;
-
-        initAudio();
-
-        if (audioCtx && audioCtx.state === "suspended") {
-          audioCtx.resume();
-        }
-
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log("PLAY ERROR:", err);
+      });
 
   }, 100);
 }
 
 // =========================
-// ⏯ AUDIO STATE
+// ⏯ STATE
 // =========================
 audio.onpause = () => playing = false;
 audio.onended = () => playing = false;
 
 // =========================
-// ⏱ FAKE PROGRESS
-// =========================
-let progress = 0;
-
-function animateProgress() {
-
-  if (playing) {
-    progress += 0.25;
-    if (progress > 100) progress = 0;
-    progressBar.style.width = progress + "%";
-  }
-
-  requestAnimationFrame(animateProgress);
-}
-
-animateProgress();
-
-// =========================
-// 📱 SWIPE
-// =========================
-let startX = 0;
-
-document.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchend", e => {
-
-  const diff = e.changedTouches[0].clientX - startX;
-
-  if (diff > 50) {
-    const prev = (currentIndex - 1 + stations.length) % stations.length;
-    play(prev);
-  }
-
-  if (diff < -50) {
-    const next = (currentIndex + 1) % stations.length;
-    play(next);
-  }
-
-});
-
-// =========================
-// 🧱 GRID UI
+// 🧱 GRID
 // =========================
 stations.forEach((s, i) => {
 
