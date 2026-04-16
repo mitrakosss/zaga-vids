@@ -564,11 +564,27 @@ body.modal-open .topbar {
    RADIO
 ========================= */
 
-.radio-grid {
+.grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-top: 20px;
+  grid-template-columns: repeat(3, 180px);
+  justify-content: center;
+  gap: 18px;
+
+  margin-top: 40px;
+  width: 100%;
+}
+
+/* responsive */
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(2, 160px);
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: repeat(1, 80%);
+  }
 }
 
 .radio-player {
