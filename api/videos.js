@@ -3,6 +3,7 @@ import { kvGet } from "./_lib_kv.js";
 import { getCookie, verifySession, json } from "./_lib_auth.js";
 
 const VIDEOS = [
+  { "id": "Zch4ZQ9UOV0", "title": "Καλλιθέα | Ιούλιος 2026", "date": "2026-09-01" },
   { "id": "Q_LtlLbX_0U", "title": "Βελιγράδι - Δεκέμβριος 2025", "date": "2026-01-08" },
   { "id": "EYghvV-XHH8", "title": "Moutoparea Rewind 2025", "date": "2026-01-08" },
   { "id": "34TF95HPhIU", "title": "Ιανουάριος 2026", "date": "2026-01-07" },
